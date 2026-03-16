@@ -174,10 +174,10 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 export default function App() {
-  const [portfolio, setPortfolio] = useState(106463);
-  const [salary, setSalary] = useState(16250);
-  const [expenses, setExpenses] = useState(11000);
-  const [retAnnual, setRetAnnual] = useState(10);
+  const [portfolio, setPortfolio] = useState(10000);
+  const [salary, setSalary] = useState(7500);
+  const [expenses, setExpenses] = useState(4500);
+  const [retAnnual, setRetAnnual] = useState(8);
   const [lombardRate, setLombardRate] = useState(2.5);
   const [ltvTarget, setLtvTarget] = useState(25);
   const [inflation, setInflation] = useState(1);
@@ -248,9 +248,9 @@ export default function App() {
         <div style={{ width: 310, flexShrink: 0 }}>
           <div style={{ background: "white", border: `1px solid ${C.border}`, borderRadius: 14, padding: "20px 22px 6px", marginBottom: 14 }}>
             <div style={{ fontSize: 10, color: C.orange, textTransform: "uppercase", letterSpacing: 2, marginBottom: 18, fontWeight: 700 }}>Portefeuille</div>
-            <Slider label="Valeur initiale" value={portfolio} onChange={setPortfolio} min={10000} max={5000000} step={5000} unit="CHF" />
+            <Slider label="Valeur initiale" value={portfolio} onChange={setPortfolio} min={0} max={1000000} step={1000} unit="CHF" />
             <Slider label="Salaire net / mois" value={salary} onChange={setSalary} min={0} max={50000} step={250} unit="CHF" />
-            <Slider label="Dépenses / mois" value={expenses} onChange={setExpenses} min={1000} max={50000} step={250} unit="CHF" />
+            <Slider label="Dépenses / mois" value={expenses} onChange={setExpenses} min={0} max={50000} step={250} unit="CHF" />
           </div>
           <div style={{ background: "white", border: `1px solid ${C.border}`, borderRadius: 14, padding: "20px 22px 6px" }}>
             <div style={{ fontSize: 10, color: C.orange, textTransform: "uppercase", letterSpacing: 2, marginBottom: 18, fontWeight: 700 }}>Hypothèses</div>
