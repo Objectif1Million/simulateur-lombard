@@ -230,13 +230,20 @@ export default function App() {
       `}</style>
 
       <div style={{ padding: "32px 36px 0", maxWidth: 1280, margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 6 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8, background: C.orange,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: C.creme, fontWeight: 800, fontSize: 16,
-          }}>L</div>
-          <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Simulateur Lombard</h1>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 8, background: C.orange,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: C.creme, fontWeight: 800, fontSize: 16,
+              }}>L</div>
+            <h1 style={{ fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: -0.5 }}>Simulateur Lombard</h1>
+          </div>
+          <a href="https://objectif1m.substack.com" target="_blank" rel="noopener noreferrer" style={{
+            display: "flex", alignItems: "center", gap: 8, padding: "8px 16px",
+            background: C.noir, borderRadius: 20, textDecoration: "none", color: C.creme,
+            fontSize: 12, fontWeight: 600, transition: "opacity 0.2s",
+          }}>Objectif 1 Million</a>
         </div>
         <p style={{ fontSize: 13, color: C.muted, margin: "6px 0 28px", maxWidth: 660, lineHeight: 1.6 }}>
           Comparez 4 stratégies de gestion de patrimoine. Tous les montants en CHF réels, corrigés de l'inflation.
