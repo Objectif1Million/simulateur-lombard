@@ -19,35 +19,51 @@ const fmt = (v) => { if (Math.abs(v) >= 1e6) return `${(v/1e6).toFixed(1)}M`; if
 const fmtCHF = (v) => `${fmt(v)} CHF`;
 const fmtFull = (v) => v.toLocaleString("fr-CH", { maximumFractionDigits: 0 });
 
-const Slider = ({ label, value, onChange, min, max, step, unit, presets, note }) => (
-  <div style={{ marginBottom: 22 }}>
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-      <span style={{ fontSize: 12, color: C.muted, fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: 17, color: C.noir, fontWeight: 700 }}>
-        {unit === "%" ? `${value}%` : unit === "CHF" ? `${fmtFull(value)} CHF` : unit === "ans" ? `${value} ${value > 1 ? "ans" : "an"}` : unit === "mois" ? `${value} mois` : value}
-      </span>
-    </div>
-    <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} style={{ width: "100%", cursor: "pointer", height: 5 }} />
-    <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
-      <span style={{ fontSize: 10, color: C.subtle }}>{unit === "%" ? `${min}%` : unit === "CHF" ? fmtFull(min) : min}</span>
-      <span style={{ fontSize: 10, color: C.subtle }}>{unit === "%" ? `${max}%` : unit === "CHF" ? fmtFull(max) : max}</span>
-    </div>
-    {presets && (
-      <div style={{ display: "flex", gap: 5, marginTop: 7, flexWrap: "wrap" }}>
-        {presets.map((p) => (
-          <button key={p.value} onClick={() => onChange(p.value)} style={{
-            padding: "3px 10px", fontSize: 10, borderRadius: 20,
-            border: value === p.value ? `1.5px solid ${C.orange}` : `1px solid ${C.border}`,
-            background: value === p.value ? C.orange + "14" : "transparent",
-            color: value === p.value ? C.orange : C.muted, cursor: "pointer",
-            fontWeight: value === p.value ? 600 : 400, transition: "all 0.15s",
-          }}>{p.label}</button>
-        ))}
+const Slider = ({ label, value, onChange, min, max, step, unit, presets, note }) => {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+  const startEdit = () => { setDraft(String(value)); setEditing(true); };
+  const confirm = () => {
+    const n = parseFloat(draft.replace(/['']/g, "").replace(",", "."));
+    if (!isNaN(n)) onChange(Math.min(max, Math.max(min, n)));
+    setEditing(false);
+  };
+  const display = unit === "%" ? `${value}%` : unit === "CHF" ? `${fmtFull(value)} CHF` : unit === "ans" ? `${value} ${value > 1 ? "ans" : "an"}` : unit === "mois" ? `${value} mois` : value;
+  return (
+    <div style={{ marginBottom: 22 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+        <span style={{ fontSize: 12, color: C.muted, fontWeight: 500 }}>{label}</span>
+        {editing ? (
+          <input autoFocus value={draft} onChange={(e) => setDraft(e.target.value)}
+            onBlur={confirm} onKeyDown={(e) => { if (e.key === "Enter") confirm(); if (e.key === "Escape") setEditing(false); }}
+            style={{ fontSize: 17, fontWeight: 700, color: C.orange, background: "white", border: `1.5px solid ${C.orange}`, borderRadius: 6, padding: "2px 8px", width: 120, textAlign: "right", outline: "none", fontFamily: "inherit" }}
+          />
+        ) : (
+          <span onClick={startEdit} style={{ fontSize: 17, color: C.noir, fontWeight: 700, cursor: "pointer", borderBottom: `1px dashed ${C.border}`, paddingBottom: 1 }} title="Clique pour éditer">{display}</span>
+        )}
       </div>
-    )}
-    {note && <div style={{ fontSize: 10, color: C.subtle, marginTop: 5, fontStyle: "italic" }}>{note}</div>}
-  </div>
-);
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(Number(e.target.value))} style={{ width: "100%", cursor: "pointer", height: 5 }} />
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 3 }}>
+        <span style={{ fontSize: 10, color: C.subtle }}>{unit === "%" ? `${min}%` : unit === "CHF" ? fmtFull(min) : min}</span>
+        <span style={{ fontSize: 10, color: C.subtle }}>{unit === "%" ? `${max}%` : unit === "CHF" ? fmtFull(max) : max}</span>
+      </div>
+      {presets && (
+        <div style={{ display: "flex", gap: 5, marginTop: 7, flexWrap: "wrap" }}>
+          {presets.map((p) => (
+            <button key={p.value} onClick={() => onChange(p.value)} style={{
+              padding: "3px 10px", fontSize: 10, borderRadius: 20,
+              border: value === p.value ? `1.5px solid ${C.orange}` : `1px solid ${C.border}`,
+              background: value === p.value ? C.orange + "14" : "transparent",
+              color: value === p.value ? C.orange : C.muted, cursor: "pointer",
+              fontWeight: value === p.value ? 600 : 400, transition: "all 0.15s",
+            }}>{p.label}</button>
+          ))}
+        </div>
+      )}
+      {note && <div style={{ fontSize: 10, color: C.subtle, marginTop: 5, fontStyle: "italic" }}>{note}</div>}
+    </div>
+  );
+};
 
 const MetricCard = ({ label, value, sub, accent }) => (
   <div style={{ background: C.creme, border: `1px solid ${C.border}`, borderRadius: 10, padding: "14px 16px", flex: 1, minWidth: 150, borderTop: `3px solid ${accent || C.border}` }}>
