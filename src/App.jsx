@@ -13,6 +13,7 @@ const TABS = [
   { id: "lombard", label: "Simulateur Lombard", icon: "🏦" },
   { id: "emergency", label: "Épargne de précaution", icon: "🛡️" },
   { id: "freedom", label: "Liberté financière", icon: "🎯" },
+  { id: "ppa", label: "Pouvoir d'achat", icon: "🌍" },
 ];
 
 const fmt = (v) => { if (Math.abs(v) >= 1e6) return `${(v/1e6).toFixed(1)}M`; if (Math.abs(v) >= 1e3) return `${(v/1e3).toFixed(0)}k`; return v.toFixed(0); };
@@ -439,12 +440,179 @@ function FreedomTab() {
 }
 
 /* ═══════════════════════════════════════
+   TAB 5: POUVOIR D'ACHAT
+   ═══════════════════════════════════════ */
+const PPA_COUNTRIES = [
+  { name: "Norvège", flag: "🇳🇴", region: "Europe", city: "Oslo", ratio: 0.88 },
+  { name: "Danemark", flag: "🇩🇰", region: "Europe", city: "Copenhague", ratio: 0.83 },
+  { name: "Islande", flag: "🇮🇸", region: "Europe", city: "Reykjavik", ratio: 0.82 },
+  { name: "Luxembourg", flag: "🇱🇺", region: "Europe", city: "Luxembourg", ratio: 0.78 },
+  { name: "Royaume-Uni", flag: "🇬🇧", region: "Europe", city: "Londres", ratio: 0.68 },
+  { name: "France", flag: "🇫🇷", region: "Europe", city: "Paris", ratio: 0.63 },
+  { name: "Allemagne", flag: "🇩🇪", region: "Europe", city: "Munich", ratio: 0.60 },
+  { name: "Pays-Bas", flag: "🇳🇱", region: "Europe", city: "Amsterdam", ratio: 0.65 },
+  { name: "Espagne", flag: "🇪🇸", region: "Europe", city: "Madrid", ratio: 0.47 },
+  { name: "Italie", flag: "🇮🇹", region: "Europe", city: "Milan", ratio: 0.50 },
+  { name: "Portugal", flag: "🇵🇹", region: "Europe", city: "Lisbonne", ratio: 0.38 },
+  { name: "Pologne", flag: "🇵🇱", region: "Europe", city: "Varsovie", ratio: 0.32 },
+  { name: "Hongrie", flag: "🇭🇺", region: "Europe", city: "Budapest", ratio: 0.30 },
+  { name: "USA (NYC)", flag: "🇺🇸", region: "Amériques", city: "New York", ratio: 0.75 },
+  { name: "USA (Miami)", flag: "🇺🇸", region: "Amériques", city: "Miami", ratio: 0.60 },
+  { name: "Canada", flag: "🇨🇦", region: "Amériques", city: "Toronto", ratio: 0.53 },
+  { name: "Mexique", flag: "🇲🇽", region: "Amériques", city: "Mexico City", ratio: 0.27 },
+  { name: "Colombie", flag: "🇨🇴", region: "Amériques", city: "Bogotá", ratio: 0.22 },
+  { name: "Brésil", flag: "🇧🇷", region: "Amériques", city: "São Paulo", ratio: 0.26 },
+  { name: "Singapour", flag: "🇸🇬", region: "Asie-Pacifique", city: "Singapour", ratio: 0.68 },
+  { name: "Australie", flag: "🇦🇺", region: "Asie-Pacifique", city: "Sydney", ratio: 0.63 },
+  { name: "Japon", flag: "🇯🇵", region: "Asie-Pacifique", city: "Tokyo", ratio: 0.52 },
+  { name: "Corée du Sud", flag: "🇰🇷", region: "Asie-Pacifique", city: "Séoul", ratio: 0.48 },
+  { name: "Thaïlande", flag: "🇹🇭", region: "Asie-Pacifique", city: "Bangkok", ratio: 0.25 },
+  { name: "Vietnam", flag: "🇻🇳", region: "Asie-Pacifique", city: "Hô-Chi-Minh", ratio: 0.20 },
+  { name: "Philippines", flag: "🇵🇭", region: "Asie-Pacifique", city: "Manille", ratio: 0.20 },
+  { name: "Émirats Arabes", flag: "🇦🇪", region: "Moyen-Orient / Afrique", city: "Dubaï", ratio: 0.58 },
+  { name: "Maroc", flag: "🇲🇦", region: "Moyen-Orient / Afrique", city: "Marrakech", ratio: 0.22 },
+  { name: "Afrique du Sud", flag: "🇿🇦", region: "Moyen-Orient / Afrique", city: "Cape Town", ratio: 0.23 },
+];
+
+const PPA_REGIONS = ["Tous", "Europe", "Amériques", "Asie-Pacifique", "Moyen-Orient / Afrique"];
+
+function PPATab() {
+  const [budget, setBudget] = useState(10000);
+  const [region, setRegion] = useState("Tous");
+  const [sort, setSort] = useState("ratio-asc");
+  const [view, setView] = useState("cost");
+
+  const swissFire = budget * 12 * 25;
+
+  const filtered = PPA_COUNTRIES
+    .filter((c) => region === "Tous" || c.region === region)
+    .sort((a, b) => {
+      if (sort === "ratio-asc") return a.ratio - b.ratio;
+      if (sort === "ratio-desc") return b.ratio - a.ratio;
+      return a.name.localeCompare(b.name);
+    });
+
+  const getCat = (ratio) => {
+    if (ratio >= 0.75) return { label: "Comparable", bg: C.border, text: C.noir };
+    if (ratio >= 0.50) return { label: "Modéré", bg: C.jaune + "30", text: "#856404" };
+    if (ratio >= 0.30) return { label: "Significatif", bg: C.ciel + "25", text: "#084298" };
+    return { label: "Très avantageux", bg: C.orange + "20", text: C.orange };
+  };
+
+  const fmtM = (val) => { if (val >= 1e6) return `${(val / 1e6).toFixed(2).replace(".", "'")} M CHF`; return `${Math.round(val / 1000)}k CHF`; };
+  const fmtBudget = (val) => val.toLocaleString("fr-CH", { style: "currency", currency: "CHF", maximumFractionDigits: 0 });
+
+  return (
+    <div>
+      {/* Budget slider */}
+      <div style={{ background: "white", border: `1px solid ${C.border}`, borderRadius: 14, padding: "20px 24px", marginBottom: 20 }}>
+        <Slider label="Ton budget mensuel en Suisse" value={budget} onChange={setBudget} min={2000} max={30000} step={500} unit="CHF" />
+      </div>
+
+      {/* Toggle cost / FIRE */}
+      <div style={{ display: "flex", gap: 0, marginBottom: 20, border: `1px solid ${C.border}`, borderRadius: 99, overflow: "hidden", width: "fit-content" }}>
+        {[["cost", "Coût mensuel"], ["fire", "Capital FIRE (règle des 4%)"]].map(([k, label]) => (
+          <button key={k} onClick={() => setView(k)} style={{
+            padding: "8px 20px", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer",
+            background: view === k ? C.noir : "white", color: view === k ? C.creme : C.muted, transition: "all .15s",
+          }}>{label}</button>
+        ))}
+      </div>
+
+      {/* Swiss FIRE banner */}
+      {view === "fire" && (
+        <div style={{ background: C.noir, color: C.creme, borderRadius: 14, padding: "16px 22px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", opacity: 0.6, marginBottom: 4 }}>Ton capital FIRE en Suisse</div>
+            <div style={{ fontSize: 26, fontWeight: 800 }}>{fmtM(swissFire)}</div>
+          </div>
+          <div style={{ fontSize: 12, opacity: 0.6, maxWidth: 280, lineHeight: 1.6 }}>
+            {fmtBudget(budget)}/mois x 12 x 25<br />Vois ci-dessous combien tu économises en changeant de pays.
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20, alignItems: "center" }}>
+        {PPA_REGIONS.map((r) => (
+          <button key={r} onClick={() => setRegion(r)} style={{
+            padding: "6px 14px", borderRadius: 99,
+            border: region === r ? `1.5px solid ${C.orange}` : `1px solid ${C.border}`,
+            background: region === r ? C.orange + "14" : "transparent",
+            color: region === r ? C.orange : C.muted, fontSize: 11, fontWeight: region === r ? 600 : 400,
+            cursor: "pointer", transition: "all .15s",
+          }}>{r}</button>
+        ))}
+        <select value={sort} onChange={(e) => setSort(e.target.value)} style={{
+          marginLeft: "auto", padding: "6px 12px", border: `1px solid ${C.border}`, borderRadius: 8,
+          fontSize: 11, color: C.muted, background: "white", cursor: "pointer",
+        }}>
+          <option value="ratio-asc">Moins cher d'abord</option>
+          <option value="ratio-desc">Plus cher d'abord</option>
+          <option value="alpha">Alphabétique</option>
+        </select>
+      </div>
+
+      {/* Cards grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
+        {filtered.map((c) => {
+          const equiv = Math.round(budget * c.ratio / 100) * 100;
+          const savings = budget - equiv;
+          const fire = equiv * 12 * 25;
+          const fireSavings = swissFire - fire;
+          const cat = getCat(c.ratio);
+          const barW = Math.round(c.ratio * 100);
+          const barColor = c.ratio >= 0.75 ? C.rose : c.ratio >= 0.50 ? C.jaune : c.ratio >= 0.30 ? C.ciel : C.orange;
+
+          return (
+            <div key={c.name + c.city} style={{ background: "white", border: `1px solid ${C.border}`, borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <div style={{ fontSize: 20 }}>{c.flag}</div>
+                  <div style={{ fontWeight: 700, fontSize: 15, marginTop: 2, color: C.noir }}>{c.name}</div>
+                  <div style={{ fontSize: 11, color: C.subtle }}>{c.city}</div>
+                </div>
+                <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: 0.5, padding: "3px 8px", borderRadius: 99, background: cat.bg, color: cat.text, whiteSpace: "nowrap" }}>{cat.label}</span>
+              </div>
+              <div>
+                {view === "cost" ? (
+                  <>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: C.noir, lineHeight: 1 }}>{fmtBudget(equiv)}</div>
+                    <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{savings > 0 ? `Tu économises ${fmtBudget(savings)} / mois` : "Coût similaire à la Suisse"}</div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: C.noir, lineHeight: 1 }}>{fmtM(fire)}</div>
+                    <div style={{ fontSize: 11, color: C.orange, marginTop: 2, fontWeight: 600 }}>{fireSavings > 0 ? `${fmtM(fireSavings)} de moins qu'en Suisse` : "Similaire à la Suisse"}</div>
+                    <div style={{ fontSize: 10, color: C.subtle, marginTop: 1 }}>{fmtBudget(equiv)}/mois · 4% rule</div>
+                  </>
+                )}
+              </div>
+              <div style={{ background: C.border, borderRadius: 99, height: 4, overflow: "hidden" }}>
+                <div style={{ width: `${barW}%`, height: "100%", borderRadius: 99, background: barColor, transition: "width .4s ease" }} />
+              </div>
+              <div style={{ fontSize: 10, color: C.subtle, textAlign: "right", marginTop: -6 }}>{Math.round(c.ratio * 100)}% du coût suisse</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Methodology */}
+      <div style={{ marginTop: 24, padding: "14px 18px", background: "white", border: `1px solid ${C.border}`, borderRadius: 12, fontSize: 11, color: C.muted, lineHeight: 1.8 }}>
+        <strong style={{ color: C.noir, display: "block", marginBottom: 4 }}>Méthodologie</strong>
+        Ratios calculés à partir des indices de coût de la vie Numbeo (Q1 2025) et des données PPP de l'OCDE. Ils reflètent un panier moyen incluant logement, alimentation, transport, loisirs. Les chiffres sont des estimations indicatives.
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════
    MAIN APP
    ═══════════════════════════════════════ */
 export default function App() {
   const [tab, setTab] = useState("compound");
-  const Content = { compound: CompoundTab, lombard: LombardTab, emergency: EmergencyTab, freedom: FreedomTab }[tab];
-
+  const Content = { compound: CompoundTab, lombard: LombardTab, emergency: EmergencyTab, freedom: FreedomTab, ppa: PPATab }[tab];
+  
   return (
     <div style={{ minHeight: "100vh", background: C.creme, color: C.noir, fontFamily: "'DM Sans', -apple-system, sans-serif" }}>
       <style>{`
