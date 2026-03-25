@@ -477,7 +477,7 @@ const PPA_COUNTRIES = [
 const PPA_REGIONS = ["Tous", "Europe", "Amériques", "Asie-Pacifique", "Moyen-Orient / Afrique"];
 
 function PPATab() {
-  const [budget, setBudget] = useState(10000);
+  const [budget, setBudget] = useState(6000);
   const [region, setRegion] = useState("Tous");
   const [sort, setSort] = useState("ratio-asc");
   const [view, setView] = useState("cost");
