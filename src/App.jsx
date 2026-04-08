@@ -597,7 +597,7 @@ function PPATab() {
                 ) : (
                   <>
                     <div style={{ fontSize: 20, fontWeight: 800, color: C.noir, lineHeight: 1 }}>{fmtM(fire)}</div>
-                    <div style={{ fontSize: 11, color: C.orange, marginTop: 2, fontWeight: 600 }}>{fireSavings > 0 ? `${fmtM(fireSavings)} de moins qu'en Suisse` : "Similaire à la Suisse"}</div>
+                    <div style={{ fontSize: 11, color: fireSavings > 0 ? C.orange : C.rose, marginTop: 2, fontWeight: 600 }}>{fireSavings > 0 ? `${fmtM(fireSavings)} de moins qu'en ${baseName}` : fireSavings < 0 ? `${fmtM(Math.abs(fireSavings))} de plus qu'en ${baseName}` : `Similaire à la ${baseName}`}</div>
                     <div style={{ fontSize: 10, color: C.subtle, marginTop: 1 }}>{fmtBudget(equiv)}/mois · 4% rule</div>
                   </>
                 )}
