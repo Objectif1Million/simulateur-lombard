@@ -29,7 +29,7 @@ const Slider = ({ label, value, onChange, min, max, step, unit, presets, note })
     if (!isNaN(n)) onChange(Math.min(max, Math.max(min, n)));
     setEditing(false);
   };
-  const display = unit === "%" ? `${value}%` : unit === "CHF" ? `${fmtFull(value)} CHF` : unit === "ans" ? `${value} ${value > 1 ? "ans" : "an"}` : unit === "mois" ? `${value} mois` : value;
+  const display = unit === "%" ? `${value}%` : (unit === "CHF" || unit === "EUR") ? `${fmtFull(value)} ${unit}` : unit === "ans" ? `${value} ${value > 1 ? "ans" : "an"}` : unit === "mois" ? `${value} mois` : value;
   return (
     <div style={{ marginBottom: 22 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
@@ -519,7 +519,7 @@ function PPATab() {
       }}>{label}</button>
     ))}
   </div>
-  <Slider label={`Ton budget mensuel en ${baseName}`} value={budget} onChange={setBudget} min={2000} max={30000} step={500} unit="CHF" />
+  <Slider label={`Ton budget mensuel en ${baseName}`} value={budget} onChange={setBudget} min={2000} max={30000} step={500} unit={currency} />
       </div>
 
       {/* Toggle cost / FIRE */}
