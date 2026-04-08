@@ -485,6 +485,7 @@ function PPATab() {
   const BASE_RATIO_FR = 0.63;
   const adjustRatio = (r) => base === "CH" ? r : Math.min(r / BASE_RATIO_FR, 1.5);
   const baseName = base === "CH" ? "Suisse" : "France";
+  const currency = base === "CH" ? "CHF" : "EUR";
   const swissFire = budget * 12 * 25;
 
   const filtered = PPA_COUNTRIES
@@ -503,8 +504,8 @@ function PPATab() {
     return { label: "Très avantageux", bg: C.orange + "20", text: C.orange };
   };
 
-  const fmtM = (val) => { if (val >= 1e6) return `${(val / 1e6).toFixed(2).replace(".", "'")} M CHF`; return `${Math.round(val / 1000)}k CHF`; };
-  const fmtBudget = (val) => val.toLocaleString("fr-CH", { style: "currency", currency: "CHF", maximumFractionDigits: 0 });
+  const fmtM = (val) => { if (val >= 1e6) return `${(val / 1e6).toFixed(2).replace(".", "'")} M ${currency}`; return `${Math.round(val / 1000)}k ${currency}`; };
+  const fmtBudget = (val) => `${val.toLocaleString("fr-CH", { maximumFractionDigits: 0 })} ${currency}`;
 
   return (
     <div>
