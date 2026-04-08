@@ -478,14 +478,18 @@ const PPA_REGIONS = ["Tous", "Europe", "Amériques", "Asie-Pacifique", "Moyen-Or
 
 function PPATab() {
   const [budget, setBudget] = useState(6000);
-  const [region, setRegion] = useState("Tous");
+  const [base, setBase] = useState("CH");  const [region, setRegion] = useState("Tous");
   const [sort, setSort] = useState("ratio-asc");
   const [view, setView] = useState("cost");
 
+  const BASE_RATIO_FR = 0.63;
+  const adjustRatio = (r) => base === "CH" ? r : Math.min(r / BASE_RATIO_FR, 1.5);
+  const baseName = base === "CH" ? "Suisse" : "France";
   const swissFire = budget * 12 * 25;
 
   const filtered = PPA_COUNTRIES
-    .filter((c) => region === "Tous" || c.region === region)
+    .filter((c) => (region === "Tous" || c.region === region) && !(base === "FR" && c.name === "France") && !(base === "CH" && false))
+    .map((c) => ({ ...c, adjRatio: adjustRatio(c.ratio) }))
     .sort((a, b) => {
       if (sort === "ratio-asc") return a.ratio - b.ratio;
       if (sort === "ratio-desc") return b.ratio - a.ratio;
@@ -506,7 +510,15 @@ function PPATab() {
     <div>
       {/* Budget slider */}
       <div style={{ background: "white", border: `1px solid ${C.border}`, borderRadius: 14, padding: "20px 24px", marginBottom: 20 }}>
-        <Slider label="Ton budget mensuel en Suisse" value={budget} onChange={setBudget} min={2000} max={30000} step={500} unit="CHF" />
+  <div style={{ display: "flex", gap: 0, marginBottom: 16, border: `1px solid ${C.border}`, borderRadius: 99, overflow: "hidden", width: "fit-content" }}>
+    {[["CH", "🇨🇭 Suisse"], ["FR", "🇫🇷 France"]].map(([k, label]) => (
+      <button key={k} onClick={() => setBase(k)} style={{
+        padding: "8px 20px", border: "none", fontSize: 12, fontWeight: 600, cursor: "pointer",
+        background: base === k ? C.noir : "white", color: base === k ? C.creme : C.muted, transition: "all .15s",
+      }}>{label}</button>
+    ))}
+  </div>
+  <Slider label={`Ton budget mensuel en ${baseName}`} value={budget} onChange={setBudget} min={2000} max={30000} step={500} unit="CHF" />
       </div>
 
       {/* Toggle cost / FIRE */}
@@ -523,7 +535,7 @@ function PPATab() {
       {view === "fire" && (
         <div style={{ background: C.noir, color: C.creme, borderRadius: 14, padding: "16px 22px", marginBottom: 20, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
           <div>
-            <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", opacity: 0.6, marginBottom: 4 }}>Ton capital FIRE en Suisse</div>
+            <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", opacity: 0.6, marginBottom: 4 }}>Ton capital FIRE en {baseName}</div>
             <div style={{ fontSize: 26, fontWeight: 800 }}>{fmtM(swissFire)}</div>
           </div>
           <div style={{ fontSize: 12, opacity: 0.6, maxWidth: 280, lineHeight: 1.6 }}>
@@ -556,13 +568,14 @@ function PPATab() {
       {/* Cards grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 12 }}>
         {filtered.map((c) => {
-          const equiv = Math.round(budget * c.ratio / 100) * 100;
+          const r = c.adjRatio;
+          const equiv = Math.round(budget * r / 100) * 100;
           const savings = budget - equiv;
           const fire = equiv * 12 * 25;
           const fireSavings = swissFire - fire;
-          const cat = getCat(c.ratio);
-          const barW = Math.round(c.ratio * 100);
-          const barColor = c.ratio >= 0.75 ? C.rose : c.ratio >= 0.50 ? C.jaune : c.ratio >= 0.30 ? C.ciel : C.orange;
+          const cat = getCat(r);
+          const barW = Math.min(100, Math.round(r * 100));
+          const barColor = r >= 0.75 ? C.rose : r >= 0.50 ? C.jaune : r >= 0.30 ? C.ciel : C.orange;
 
           return (
             <div key={c.name + c.city} style={{ background: "white", border: `1px solid ${C.border}`, borderRadius: 12, padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
@@ -591,7 +604,7 @@ function PPATab() {
               <div style={{ background: C.border, borderRadius: 99, height: 4, overflow: "hidden" }}>
                 <div style={{ width: `${barW}%`, height: "100%", borderRadius: 99, background: barColor, transition: "width .4s ease" }} />
               </div>
-              <div style={{ fontSize: 10, color: C.subtle, textAlign: "right", marginTop: -6 }}>{Math.round(c.ratio * 100)}% du coût suisse</div>
+              <div style={{ fontSize: 10, color: C.subtle, textAlign: "right", marginTop: -6 }}>{Math.min(150, Math.round(r * 100))}% du coût {baseName.toLowerCase()}</div>
             </div>
           );
         })}
