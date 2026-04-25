@@ -118,8 +118,8 @@ function CompoundTab() {
   const multiplier = last.invested > 0 ? (last.total / last.invested).toFixed(1) : "0";
 
   return (
-    <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
-      <div style={{ width: 310, flexShrink: 0 }}>
+    <div className="o1m-layout" style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
+      <div className="o1m-controls" style={{ width: 310, flexShrink: 0 }}>
         <Panel title="Paramètres">
           <Slider label="Capital initial" value={initial} onChange={setInitial} min={0} max={500000} step={1000} unit="CHF" />
           <Slider label="Versement mensuel" value={monthly} onChange={setMonthly} min={0} max={10000} step={100} unit="CHF" />
@@ -129,7 +129,7 @@ function CompoundTab() {
         </Panel>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+        <div className="o1m-metrics" style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
           <MetricCard label="Capital final" value={fmtCHF(last.total)} sub={`x${multiplier} sur ton investissement`} accent={C.orange} />
           <MetricCard label="Total investi" value={fmtCHF(last.invested)} sub={`${fmtFull(initial)} initial + ${fmtFull(monthly)}/mois`} accent={C.bleu} />
           <MetricCard label="Gains (intérêts)" value={fmtCHF(last.gains)} sub={`${((last.gains / last.total) * 100).toFixed(0)}% du capital final`} accent={C.jaune} />
@@ -214,7 +214,7 @@ function LombardTab() {
 
   return (
     <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
-      <div style={{ width: 310, flexShrink: 0 }}>
+      <div className="o1m-controls" style={{ width: 310, flexShrink: 0 }}>
         <Panel title="Portefeuille">
           <Slider label="Valeur initiale" value={portfolio} onChange={setPortfolio} min={0} max={5000000} step={5000} unit="CHF" />
           <Slider label="Salaire net / mois" value={salary} onChange={setSalary} min={0} max={50000} step={250} unit="CHF" />
@@ -231,7 +231,7 @@ function LombardTab() {
         </Panel>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+        <div className="o1m-metrics" style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
           <MetricCard label="Lombard" value={fmtCHF(last.lombard)} sub={`${gain>=0?"+":""}${fmtCHF(gain)} vs classique (${gain>=0?"+":""}${gainPct}%)`} accent={C.orange} />
           <MetricCard label="Classique" value={fmtCHF(last.classic)} sub="Surplus investi" accent={C.bleu} />
           <MetricCard label="LTV final" value={`${(last.lombardLTV*100).toFixed(1)}%`} sub={`Dette: ${fmtCHF(last.lombardDebt)}`} accent={last.lombardLTV>0.4?C.rose:last.lombardLTV>0.25?C.jaune:C.orange} />
@@ -292,7 +292,7 @@ function EmergencyTab() {
 
   return (
     <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
-      <div style={{ width: 310, flexShrink: 0 }}>
+      <div className="o1m-controls" style={{ width: 310, flexShrink: 0 }}>
         <Panel title="Ta situation">
           <Slider label="Dépenses mensuelles" value={monthlyExp} onChange={setMonthlyExp} min={1000} max={20000} step={250} unit="CHF" />
           <Slider label="Objectif (en mois)" value={targetMonths} onChange={setTargetMonths} min={1} max={12} step={1} unit="mois"
@@ -302,7 +302,7 @@ function EmergencyTab() {
         </Panel>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+        <div className="o1m-metrics" style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
           <MetricCard label="Objectif" value={`${fmtFull(target)} CHF`} sub={`${targetMonths} mois de dépenses`} accent={C.orange} />
           <MetricCard label="Il te reste" value={remaining > 0 ? `${fmtFull(remaining)} CHF` : "Objectif atteint"} sub={remaining > 0 && monthlySaving > 0 ? `~${monthsToGoal} mois à ${fmtFull(monthlySaving)}/mois` : ""} accent={remaining > 0 ? C.bleu : C.orange} />
           <MetricCard label="Progression" value={`${progress.toFixed(0)}%`} accent={progress >= 100 ? C.orange : progress >= 50 ? C.jaune : C.rose} />
@@ -373,7 +373,7 @@ function FreedomTab() {
 
   return (
     <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start" }}>
-      <div style={{ width: 310, flexShrink: 0 }}>
+      <div className="o1m-controls" style={{ width: 310, flexShrink: 0 }}>
         <Panel title="Ta situation">
           <Slider label="Portefeuille actuel" value={portfolio} onChange={setPortfolio} min={0} max={2000000} step={5000} unit="CHF" />
           <Slider label="Investissement mensuel" value={monthlyInvest} onChange={setMonthlyInvest} min={0} max={10000} step={100} unit="CHF" />
@@ -389,7 +389,7 @@ function FreedomTab() {
         </Panel>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
+        <div className="o1m-metrics" style={{ display: "flex", gap: 10, marginBottom: 18, flexWrap: "wrap" }}>
           <MetricCard label="Ton FIRE number" value={fmtCHF(fireTarget)} sub={`${fmtFull(monthlyExp * 12)} CHF/an ÷ ${withdrawRate}%`} accent={C.orange} />
           <MetricCard label="Liberté financière dans" value={freedomYear !== null && freedomYear <= 50 ? `${freedomYear} ans` : "> 50 ans"} sub={freedomYear !== null && freedomYear <= 50 ? `Vers ${new Date().getFullYear() + freedomYear}` : "Ajuste tes paramètres"} accent={freedomYear !== null && freedomYear <= 50 ? (freedomYear <= 10 ? C.orange : freedomYear <= 20 ? C.jaune : C.bleu) : C.rose} />
           <MetricCard label="Progression" value={`${Math.min(100, (portfolio / fireTarget) * 100).toFixed(0)}%`} sub={`${fmtCHF(portfolio)} / ${fmtCHF(fireTarget)}`} accent={C.bleu} />
@@ -637,8 +637,17 @@ export default function App() {
         ::-webkit-scrollbar { width: 5px; height: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: ${C.border}; border-radius: 3px; }
+        @media (max-width: 768px) {
+          .o1m-layout { flex-direction: column !important; }
+          .o1m-controls { width: 100% !important; }
+          .o1m-tabs { gap: 0 !important; }
+          .o1m-tabs button { padding: 8px 12px !important; font-size: 11px !important; }
+          .o1m-header { padding: 20px 16px 0 !important; }
+          .o1m-content { padding: 0 16px 32px !important; }
+          .o1m-metrics { flex-direction: column !important; }
+        }
       `}</style>
-      <div style={{ padding: "28px 36px 0", maxWidth: 1280, margin: "0 auto" }}>
+      <div className="o1m-header" style={{ padding: "28px 36px 0", maxWidth: 1280, margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 36, height: 36, borderRadius: 8, background: C.orange, display: "flex", alignItems: "center", justifyContent: "center", color: C.creme, fontWeight: 800, fontSize: 11 }}>O1M</div>
@@ -646,7 +655,7 @@ export default function App() {
           </div>
           <a href="https://objectif1m.substack.com" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", background: C.noir, borderRadius: 20, textDecoration: "none", color: C.creme, fontSize: 12, fontWeight: 600 }}>Objectif 1 Million</a>
         </div>
-        <div style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
+        <div className="o1m-tabs" style={{ display: "flex", gap: 4, overflowX: "auto", paddingBottom: 2 }}>
           {TABS.map((t) => (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
               padding: "10px 20px", fontSize: 13, fontWeight: tab === t.id ? 700 : 400,
@@ -658,7 +667,7 @@ export default function App() {
         </div>
         <div style={{ height: 1, background: C.border, marginBottom: 24 }} />
       </div>
-      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "0 36px 48px" }}>
+      <div className="o1m-content" style={{ maxWidth: 1280, margin: "0 auto", padding: "0 36px 48px" }}>
         <Content />
         <div style={{ marginTop: 18 }}>
           <p style={{ fontSize: 10, color: C.subtle, lineHeight: 1.7, margin: 0 }}>Simulations indicatives. Ne constituent pas un conseil en investissement. Les performances passées ne préjugent pas des performances futures.</p>
